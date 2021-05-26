@@ -216,8 +216,14 @@ void AC_Loiter::update()
     }
 
     // initialise pos controller speed and acceleration
+    #if MODE_LOITER_ENABLED == ENABLED
     _pos_control.set_max_speed_xy(_speed_cms);
     _pos_control.set_max_accel_xy(_accel_cmss);
+    #endif
+    #if MODE_LOITER_F_ENABLED == ENABLED
+    _pos_control.set_max_speed_xy(100);
+    _pos_control.set_max_accel_xy(_accel_cmss);
+    #endif
 
     calc_desired_velocity(dt);
     _pos_control.update_xy_controller();
