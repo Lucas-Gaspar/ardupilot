@@ -65,6 +65,12 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
             break;
 #endif
 
+#if MODE_LOITER_F_ENABLED == ENABLED
+        case Mode::Number::LOITERF:
+            ret = &mode_loiterf;
+            break;
+#endif
+
 #if MODE_GUIDED_ENABLED == ENABLED
         case Mode::Number::GUIDED:
             ret = &mode_guided;

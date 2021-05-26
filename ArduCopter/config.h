@@ -330,6 +330,12 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
+// Loiter mode - allows vehicle to hold global position
+#ifndef MODE_LOITER_F_ENABLED
+# define MODE_LOITER_F_ENABLED ENABLED
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
 // Position Hold - enable holding of global position
 #ifndef MODE_POSHOLD_ENABLED
 # define MODE_POSHOLD_ENABLED ENABLED
