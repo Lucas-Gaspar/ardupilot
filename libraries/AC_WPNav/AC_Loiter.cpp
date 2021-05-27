@@ -1,9 +1,12 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AC_Loiter.h"
+#include "../ArduCopter/Copter.h"
+#include "../ArduCopter/mode.h"
+//#include "../ArduCopter/UserParameters.h"
 
 extern const AP_HAL::HAL& hal;
 
-#define LOITER_SPEED_DEFAULT                1250.0f // default loiter speed in cm/s
+#define LOITER_SPEED_DEFAULT                650.0f // default loiter speed in cm/s
 #define LOITER_SPEED_MIN                    20.0f   // minimum loiter speed in cm/s
 #define LOITER_ACCEL_MAX_DEFAULT            500.0f  // default acceleration in loiter mode
 #define LOITER_BRAKE_ACCEL_DEFAULT          250.0f  // minimum acceleration in loiter mode
@@ -12,6 +15,7 @@ extern const AP_HAL::HAL& hal;
 #define LOITER_VEL_CORRECTION_MAX           200.0f  // max speed used to correct position errors in loiter
 #define LOITER_POS_CORRECTION_MAX           200.0f  // max position error in loiter
 #define LOITER_ACTIVE_TIMEOUT_MS            200     // loiter controller is considered active if it has been called within the past 200ms (0.2 seconds)
+#define LOITER_FAST                         1500.0f
 
 const AP_Param::GroupInfo AC_Loiter::var_info[] = {
 
@@ -216,14 +220,23 @@ void AC_Loiter::update()
     }
 
     // initialise pos controller speed and acceleration
-    #if MODE_LOITER_ENABLED == ENABLED
+    
+    // Define a velocidade do modo loiter, rapido ou lento, de acordo com o modo de voo selecionado
+    // Arrumar esse codigo, usar parametros em vez de defines
+    if( static_cast<int>(copter.control_mode) == 27)
+    {
+        _speed_cms = LOITER_SPEED_DEFAULT;
+    }
+    else
+    {
+        _speed_cms = LOITER_FAST;
+    }
+    /////////////////////////////////////////////////
+
+
     _pos_control.set_max_speed_xy(_speed_cms);
+    
     _pos_control.set_max_accel_xy(_accel_cmss);
-    #endif
-    #if MODE_LOITER_F_ENABLED == ENABLED
-    _pos_control.set_max_speed_xy(100);
-    _pos_control.set_max_accel_xy(_accel_cmss);
-    #endif
 
     calc_desired_velocity(dt);
     _pos_control.update_xy_controller();
@@ -231,7 +244,7 @@ void AC_Loiter::update()
 
 // sanity check parameters
 void AC_Loiter::sanity_check_params()
-{
+{   
     _speed_cms = MAX(_speed_cms, LOITER_SPEED_MIN);
     _accel_cmss = MIN(_accel_cmss, GRAVITY_MSS * 100.0f * tanf(ToRad(_attitude_control.lean_angle_max() * 0.01f)));
 }
@@ -246,6 +259,8 @@ void AC_Loiter::calc_desired_velocity(float nav_dt)
     // calculate a loiter speed limit which is the minimum of the value set by the LOITER_SPEED
     // parameter and the value set by the EKF to observe optical flow limits
     float gnd_speed_limit_cms = MIN(_speed_cms, ekfGndSpdLimit*100.0f);
+
+
     gnd_speed_limit_cms = MAX(gnd_speed_limit_cms, LOITER_SPEED_MIN);
 
     float pilot_acceleration_max = GRAVITY_MSS*100.0f * tanf(radians(get_angle_max_cd()*0.01f));

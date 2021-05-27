@@ -13,10 +13,13 @@ public:
     AP_Int8 get_int8Param() const { return _int8; }
     AP_Int16 get_int16Param() const { return _int16; }
     AP_Float get_floatParam() const { return _float; }
+    AP_Float get_speedParam() const { return _speed_loiter; }
     
 private:
     // Put your parameter variable definitions here
     AP_Int8 _int8;
     AP_Int16 _int16;
     AP_Float _float;
+    AP_Float _speed_loiter;
+
 };

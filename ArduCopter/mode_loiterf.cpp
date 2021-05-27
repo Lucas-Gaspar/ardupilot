@@ -82,6 +82,7 @@ void ModeLoiterf::run()
     // initialize vertical speed and acceleration
     pos_control->set_max_speed_z(-get_pilot_speed_dn(), g.pilot_speed_up);
     pos_control->set_max_accel_z(g.pilot_accel_z);
+    pos_control->set_max_speed_xy(250.0f);
 
     // process pilot inputs unless we are in radio failsafe
     if (!copter.failsafe.radio) {
@@ -173,6 +174,7 @@ void ModeLoiterf::run()
 
         // run loiter controller
         loiter_nav->update();
+
 
         // call attitude controller
         attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(loiter_nav->get_roll(), loiter_nav->get_pitch(), target_yaw_rate);
